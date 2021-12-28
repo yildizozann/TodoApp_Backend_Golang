@@ -4,7 +4,8 @@ import (
 	"todo_app/config"
 	"todo_app/internal/todo"
 
-	"github.com/gofiber/fiber/v2"
+	"log"
+	"os"
 )
 
 func main(){
@@ -15,10 +16,12 @@ func main(){
 
 	handler.RegisterRoutes(app)
 
-    app.Get("/", func(c *fiber.Ctx) error {
-        return c.SendString("Hello, World 👋!")
-    })
-
 	config.ConnectDB()
-    app.Listen(":3000")
+	port := os.Getenv("PORT")
+    err := app.Listen(":" + port)
+
+    if err != nil {
+        log.Fatal("Error app failed to start")
+        panic(err)
+    }
 }

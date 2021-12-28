@@ -6,6 +6,9 @@ import (
 	"log"
 	"time"
 
+	"os"
+
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -19,7 +22,13 @@ type MongoInstance struct {
 var MI MongoInstance
 
 func ConnectDB() {
-    client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+    if os.Getenv("APP_ENV") != "production" {
+        err := godotenv.Load()
+        if err != nil {
+            log.Fatal("Error loading .env file")
+        }
+    }
+    client, err := mongo.NewClient(options.Client().ApplyURI(os.Getenv("MONGO_URI")))
     if err != nil {
         log.Fatal(err)
     }
@@ -41,6 +50,6 @@ func ConnectDB() {
 
     MI = MongoInstance{
         Client: client,
-        DB:     client.Database("To_Do_App_Database"),
+        DB:     client.Database(os.Getenv("DB")),
     }
 }
